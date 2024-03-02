@@ -64,9 +64,9 @@ def calculate_sample_risk_factors(poss_comb, condition, num_ans):
 
     #Define weight vector associated with questions with condition:
     if condition == 'heart attack':
-        weight_vector = [1, 1, 1, 1, 1, 2, 2, 2, 2, 1]
+        weight_vector = [2, 1, 1, 1, 1, 3, 3, 2, 3, 2]
     else:
-        weight_vector = [2, 1, 1, 2, 2, 1, 1, 2, 1, 2]
+        weight_vector = [2, 1, 1, 2, 2, 1, 1, 2, 1, 1]
 
     #Calculate risk factor associated with each possible combination of answers:
     for i in range(len(poss_comb)):
