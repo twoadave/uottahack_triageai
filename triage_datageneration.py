@@ -1,7 +1,10 @@
 '''TriageAI: Created for uOttaHack 6
 Neural network triaging.
 
-Created by: David J. Gayowsky, March 2nd 2024'''
+Created by: David J. Gayowsky, March 2nd 2024
+
+IN THIS FILE: Data generation, input number of total answers, condition, and fraction of data points we wish 
+                to use for each of training and testing our neural network.'''
 
 #######################################################################
 
