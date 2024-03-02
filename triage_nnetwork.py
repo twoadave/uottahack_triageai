@@ -8,6 +8,10 @@ Created by: David J. Gayowsky, March 2nd 2024'''
 import numpy as np
 import itertools
 
+import matplotlib.pyplot as plt
+import os
+import pathlib 
+
 #######################################################################
 
 '''Create test case criteria: 
@@ -51,33 +55,51 @@ def create_sample_answerspace(num_ans):
     return poss_comb
 
 #Define a function to calculate overall risk factors, weighted by symptom.
-def calculate_sample_risk_factors(poss_comb, condition):
+def calculate_sample_risk_factors(poss_comb, condition, num_ans):
 
     #Note: Here we explicitly define symptoms and weight them according to patient's assumed condition.
-    #Using standard weighted average: sum of terms divided by sum of weights.
+    #Using standard weighted average: sum of terms divided by number of terms.
 
     all_risk_factors = []
 
     #Define weight vector associated with questions with condition:
     if condition == 'heart attack':
-        weight_vector = [0.25, 0.25, 0.25, 0.25, 1, 2, 2, 2, 2, 1]
+        weight_vector = [1, 1, 1, 1, 1, 2, 2, 2, 2, 1]
     else:
-        weight_vector = [2, 1, 1, 2, 2, 0.25, 0.25, 2, 1, 2]
+        weight_vector = [2, 1, 1, 2, 2, 1, 1, 2, 1, 2]
 
     #Calculate risk factor associated with each possible combination of answers:
-    weight_sum = np.sum(weight_vector)
     for i in range(len(poss_comb)):
-        risk_factor = np.round(np.dot(poss_comb[i], weight_vector)/weight_sum)
+        risk_factor = np.dot(poss_comb[i], weight_vector)/num_ans
         all_risk_factors.append(risk_factor)
 
     poss_risk_factors = [0, 1, 2]
 
     return all_risk_factors, poss_risk_factors
 
+#Define a function to look at distribution of our data via histogram.
+def distribution_view(all_risk_factors):
 
+    basefolder = pathlib.Path(__file__)
+
+    script_dir = os.path.dirname(__file__)
+    plots_dir = os.path.join(script_dir, 'Plots/')
+
+    if not os.path.isdir(plots_dir):
+        os.makedirs(plots_dir)
+
+    plt.hist(all_risk_factors)
+    plt.title('Distribution of Calculated Risk Factors for Heart Attack \n Across Sample Answerspace')
+    plt.xlabel('Risk Factor Value')
+    plt.ylabel('Number of Possibled Responses')
+    plt.savefig(plots_dir + 'answerspace_riskfactor_dist_unrounded.png')
 
 #######################################################################
     
 if __name__ == '__main__':
 
-    pass
+    num_ans = 10
+    poss_comb = create_sample_answerspace(num_ans)
+    all_risk_factors, poss_risk_factors = calculate_sample_risk_factors(poss_comb, 'heart attack', num_ans)
+
+    distribution_view(all_risk_factors)
