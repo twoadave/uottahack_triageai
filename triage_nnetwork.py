@@ -146,7 +146,15 @@ def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_f
     poss_comb_training_tensor = torch.tensor(poss_comb_training)
     training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)'''
 
-    np.savez_compressed('/NN_Data/data_%g_frac_heartattack.npz'%(data_set_frac), poss_rf = poss_risk_factors, rf_training=risk_factors_training, pc_training=poss_comb_training, rf_testing=risk_factors_testing, pc_testing=poss_comb_testing)
+    basefolder = pathlib.Path(__file__)
+
+    script_dir = os.path.dirname(__file__)
+    numbers_dir = os.path.join(script_dir, 'NN_Data/')
+
+    if not os.path.isdir(numbers_dir):
+        os.makedirs(numbers_dir)
+
+    np.savez_compressed(numbers_dir + 'data_%g_frac_heartattack.npz'%(data_set_frac), poss_rf = poss_risk_factors, rf_training=risk_factors_training, pc_training=poss_comb_training, rf_testing=risk_factors_testing, pc_testing=poss_comb_testing)
     
 #Now create a function that runs all our shit.
 def generate_datasets(num_ans, condition, data_set_frac):
