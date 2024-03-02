@@ -106,16 +106,8 @@ def distribution_view(all_risk_factors):
     
 #CREATION OF TRAINING AND TESTING DATASETS
 
-#Throw our data into tensors that we can use.
-'''def create_tensor(poss_comb, all_risk_factors):
-
-    all_responses_tensor = torch.tensor(poss_comb)
-    all_risk_factors_tensor = torch.tensor(all_risk_factors)
-
-    return all_responses_tensor, all_risk_factors_tensor'''
-
 #Now create a function to split into training and testing data.
-def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_frac):
+def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_frac, poss_risk_factors):
 
     #We want to do this probabilistically, so we want approximately the same 
     #amount of data from each part of the sample space. 
@@ -138,57 +130,40 @@ def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_f
     risk_factors_training = all_risk_factors[training_indices]
     poss_comb_training = poss_comb[training_indices]
 
-    #Convert to a tensor:
-    risk_factors_training_tensor = torch.tensor(risk_factors_training)
-    poss_comb_training_tensor = torch.tensor(poss_comb_training)
-    training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)
-
     #Now repeat the above but with testing data:
     testing_indices = shuffled_indices[data_points_per_set:]
     risk_factors_testing = all_risk_factors[testing_indices]
     poss_comb_testing = poss_comb[testing_indices]
 
-    #Convert to a tensor:
+    print(risk_factors_training)
+    print(risk_factors_testing)
+
+    '''#Convert to a tensor:
     risk_factors_testing_tensor = torch.tensor(risk_factors_testing)
     poss_comb_testing_tensor = torch.tensor(poss_comb_testing)
     testing_dataset = TensorDataset(poss_comb_testing_tensor, risk_factors_testing_tensor)
-
-    return training_dataset, testing_dataset
-
-    #An attempt at random over/under sampling - depreciated because it's stupid and also wasn't really working lol
-    #there are like, better ways to do this so the intent was there
-    '''#Figure out the indices of the classes:
-    risk_0_indices = np.where(all_risk_factors == 0)
-    risk_1_indices = np.where(all_risk_factors == 1)
-    risk_2_indices = np.where(all_risk_factors == 2)
-
-    #Now shuffle these:
-    np.random.shuffle(risk_0_indices)
-    np.random.shuffle(risk_1_indices)
-    np.random.shuffle(risk_2_indices)
-
-    #Now take the bottom number of data points per class to use as our training data:
-    training_0_indices = risk_0_indices[:data_points_per_class]
-    training_1_indices = risk_1_indices[:data_points_per_class]
-    training_2_indices = risk_2_indices[:data_points_per_class]
-
-    #Now we have the training combinations, and we know their associated risk factors...
-    training_0_combs = poss_comb[training_0_indices]
-    training_1_combs = poss_comb[training_1_indices]
-    training_2_combs = poss_comb[training_2_indices]'''
-
-
-
-
-
     
+    #Convert to a tensor:
+    risk_factors_training_tensor = torch.tensor(risk_factors_training)
+    poss_comb_training_tensor = torch.tensor(poss_comb_training)
+    training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)'''
+
+    #np.savez_compressed('/NN_Data/data_%g_frac.npz'%(data_set_frac), poss_rf = poss_risk_factors, rf_training=risk_factors_training, pc_training=poss_comb_training, rf_testing=risk_factors_testing, pc_testing=poss_comb_testing)
+    
+#Now create a function that runs all our shit.
+def generate_datasets(num_ans, condition, data_set_frac):
+
+    poss_comb = create_sample_answerspace(num_ans)
+    all_risk_factors, poss_risk_factors, total_num_datapoints = calculate_sample_risk_factors(poss_comb, condition, num_ans)
+    create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_frac, poss_risk_factors)
+
 
 #######################################################################
     
 if __name__ == '__main__':
 
     num_ans = 10
-    poss_comb = create_sample_answerspace(num_ans)
-    all_risk_factors, poss_risk_factors = calculate_sample_risk_factors(poss_comb, 'heart attack', num_ans)
+    condition = 'heart attack'
+    data_set_frac = 0.5
 
-    distribution_view(all_risk_factors)
+    generate_datasets(num_ans, condition, data_set_frac)
