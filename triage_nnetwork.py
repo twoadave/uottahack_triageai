@@ -13,6 +13,7 @@ import os
 import pathlib 
 
 import torch
+from torch.utils.data import TensorDataset
 
 #######################################################################
 
@@ -80,8 +81,9 @@ def calculate_sample_risk_factors(poss_comb, condition, num_ans):
         all_risk_factors.append(risk_factor)
 
     poss_risk_factors = [0, 1, 2]
+    total_num_datapoints = len(all_risk_factors)
 
-    return all_risk_factors, poss_risk_factors
+    return all_risk_factors, poss_risk_factors, total_num_datapoints
 
 #Define a function to look at distribution of our data via histogram.
 def distribution_view(all_risk_factors):
@@ -105,13 +107,82 @@ def distribution_view(all_risk_factors):
 #CREATION OF TRAINING AND TESTING DATASETS
 
 #Throw our data into tensors that we can use.
-def create_tensor(poss_comb, all_risk_factors):
+'''def create_tensor(poss_comb, all_risk_factors):
 
     all_responses_tensor = torch.tensor(poss_comb)
     all_risk_factors_tensor = torch.tensor(all_risk_factors)
 
-    return all_responses_tensor, all_risk_factors_tensor
+    return all_responses_tensor, all_risk_factors_tensor'''
+
+#Now create a function to split into training and testing data.
+def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_frac):
+
+    #We want to do this probabilistically, so we want approximately the same 
+    #amount of data from each part of the sample space. 
+    #We also want to use minimal training and testing data, so want to declare the amount of data points we'd like to use.
+
+    #Data set frac represents the fraction of the total data set we would like to use for training
+    #and testing, where 0 < data_set_frac <= 0.5.
+
+    #For M total training data points, we say:
+    data_points_per_set = np.floor(data_set_frac*total_num_datapoints)
+
+    #Create a shuffled random list of indices we want to grab:
+    shuffled_indices = np.arange(total_num_datapoints)
+    np.random.shuffle(shuffled_indices)
+
+    #Grab a fraction of these indices to be our training data, randomly sampled:
+    training_indices = shuffled_indices[:data_points_per_set]
+
+    #Now, get a list of our risk factors as a function of these indices.
+    risk_factors_training = all_risk_factors[training_indices]
+    poss_comb_training = poss_comb[training_indices]
+
+    #Convert to a tensor:
+    risk_factors_training_tensor = torch.tensor(risk_factors_training)
+    poss_comb_training_tensor = torch.tensor(poss_comb_training)
+    training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)
+
+    #Now repeat the above but with testing data:
+    testing_indices = shuffled_indices[data_points_per_set:]
+    risk_factors_testing = all_risk_factors[testing_indices]
+    poss_comb_testing = poss_comb[testing_indices]
+
+    #Convert to a tensor:
+    risk_factors_testing_tensor = torch.tensor(risk_factors_testing)
+    poss_comb_testing_tensor = torch.tensor(poss_comb_testing)
+    testing_dataset = TensorDataset(poss_comb_testing_tensor, risk_factors_testing_tensor)
+
+    return training_dataset, testing_dataset
+
+    #An attempt at random over/under sampling - depreciated because it's stupid and also wasn't really working lol
+    #there are like, better ways to do this so the intent was there
+    '''#Figure out the indices of the classes:
+    risk_0_indices = np.where(all_risk_factors == 0)
+    risk_1_indices = np.where(all_risk_factors == 1)
+    risk_2_indices = np.where(all_risk_factors == 2)
+
+    #Now shuffle these:
+    np.random.shuffle(risk_0_indices)
+    np.random.shuffle(risk_1_indices)
+    np.random.shuffle(risk_2_indices)
+
+    #Now take the bottom number of data points per class to use as our training data:
+    training_0_indices = risk_0_indices[:data_points_per_class]
+    training_1_indices = risk_1_indices[:data_points_per_class]
+    training_2_indices = risk_2_indices[:data_points_per_class]
+
+    #Now we have the training combinations, and we know their associated risk factors...
+    training_0_combs = poss_comb[training_0_indices]
+    training_1_combs = poss_comb[training_1_indices]
+    training_2_combs = poss_comb[training_2_indices]'''
+
+
+
+
+
     
+
 #######################################################################
     
 if __name__ == '__main__':
