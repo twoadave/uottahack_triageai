@@ -75,13 +75,14 @@ def calculate_sample_risk_factors(poss_comb, condition, num_ans):
     for i in range(len(poss_comb)):
         risk_factor = np.dot(poss_comb[i], weight_vector)/num_ans
         if risk_factor < 1:
-            risk_factor = np.round(risk_factor)
+            risk_factor = int(np.round(risk_factor))
         else:
-            risk_factor = np.ceil(risk_factor)
+            risk_factor = int(np.ceil(risk_factor))
         all_risk_factors.append(risk_factor)
 
     poss_risk_factors = [0, 1, 2]
     total_num_datapoints = len(all_risk_factors)
+    all_risk_factors = np.array(all_risk_factors)
 
     return all_risk_factors, poss_risk_factors, total_num_datapoints
 
@@ -117,14 +118,14 @@ def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_f
     #and testing, where 0 < data_set_frac <= 0.5.
 
     #For M total training data points, we say:
-    data_points_per_set = np.floor(data_set_frac*total_num_datapoints)
+    data_points_per_set = int(np.floor(data_set_frac*total_num_datapoints))
 
     #Create a shuffled random list of indices we want to grab:
     shuffled_indices = np.arange(total_num_datapoints)
     np.random.shuffle(shuffled_indices)
 
     #Grab a fraction of these indices to be our training data, randomly sampled:
-    training_indices = shuffled_indices[:data_points_per_set]
+    training_indices = np.array(shuffled_indices[:data_points_per_set])
 
     #Now, get a list of our risk factors as a function of these indices.
     risk_factors_training = all_risk_factors[training_indices]
@@ -134,9 +135,6 @@ def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_f
     testing_indices = shuffled_indices[data_points_per_set:]
     risk_factors_testing = all_risk_factors[testing_indices]
     poss_comb_testing = poss_comb[testing_indices]
-
-    print(risk_factors_training)
-    print(risk_factors_testing)
 
     '''#Convert to a tensor:
     risk_factors_testing_tensor = torch.tensor(risk_factors_testing)
@@ -148,7 +146,7 @@ def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_f
     poss_comb_training_tensor = torch.tensor(poss_comb_training)
     training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)'''
 
-    #np.savez_compressed('/NN_Data/data_%g_frac.npz'%(data_set_frac), poss_rf = poss_risk_factors, rf_training=risk_factors_training, pc_training=poss_comb_training, rf_testing=risk_factors_testing, pc_testing=poss_comb_testing)
+    np.savez_compressed('/NN_Data/data_%g_frac_heartattack.npz'%(data_set_frac), poss_rf = poss_risk_factors, rf_training=risk_factors_training, pc_training=poss_comb_training, rf_testing=risk_factors_testing, pc_testing=poss_comb_testing)
     
 #Now create a function that runs all our shit.
 def generate_datasets(num_ans, condition, data_set_frac):
