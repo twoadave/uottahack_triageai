@@ -39,8 +39,6 @@ Train and test neural network using subsets of training data of order P = Q/M â‰
 Save neural network weights with desired accuracy.
 
 Test again using saved neural network weights, loading from file and measuring time.
-
-Demo test cases.
 '''
 
 #######################################################################
