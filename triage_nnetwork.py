@@ -163,7 +163,6 @@ def generate_datasets(num_ans, condition, data_set_frac):
     all_risk_factors, poss_risk_factors, total_num_datapoints = calculate_sample_risk_factors(poss_comb, condition, num_ans)
     create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_frac, poss_risk_factors)
 
-
 #######################################################################
     
 if __name__ == '__main__':
