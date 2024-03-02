@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import os
 import pathlib 
 
+import torch
+
 #######################################################################
 
 '''Create test case criteria: 
@@ -42,7 +44,7 @@ Demo test cases.
 
 #######################################################################
 
-#CREATION OF TRAINING AND TESTING DATASETS
+#CREATION OF DATA
 
 #Define a function to create a sample answerspace:
 def create_sample_answerspace(num_ans):
@@ -98,6 +100,18 @@ def distribution_view(all_risk_factors):
     plt.ylabel('Number of Possibled Responses')
     plt.savefig(plots_dir + 'answerspace_riskfactor_dist_rounded.png')
 
+#######################################################################
+    
+#CREATION OF TRAINING AND TESTING DATASETS
+
+#Throw our data into tensors that we can use.
+def create_tensor(poss_comb, all_risk_factors):
+
+    all_responses_tensor = torch.tensor(poss_comb)
+    all_risk_factors_tensor = torch.tensor(all_risk_factors)
+
+    return all_responses_tensor, all_risk_factors_tensor
+    
 #######################################################################
     
 if __name__ == '__main__':
