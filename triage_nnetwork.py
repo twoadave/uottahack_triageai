@@ -71,6 +71,10 @@ def calculate_sample_risk_factors(poss_comb, condition, num_ans):
     #Calculate risk factor associated with each possible combination of answers:
     for i in range(len(poss_comb)):
         risk_factor = np.dot(poss_comb[i], weight_vector)/num_ans
+        if risk_factor < 1:
+            risk_factor = np.round(risk_factor)
+        else:
+            risk_factor = np.ceil(risk_factor)
         all_risk_factors.append(risk_factor)
 
     poss_risk_factors = [0, 1, 2]
@@ -92,7 +96,7 @@ def distribution_view(all_risk_factors):
     plt.title('Distribution of Calculated Risk Factors for Heart Attack \n Across Sample Answerspace')
     plt.xlabel('Risk Factor Value')
     plt.ylabel('Number of Possibled Responses')
-    plt.savefig(plots_dir + 'answerspace_riskfactor_dist_unrounded.png')
+    plt.savefig(plots_dir + 'answerspace_riskfactor_dist_rounded.png')
 
 #######################################################################
     
