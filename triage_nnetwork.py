@@ -38,11 +38,10 @@ Demo test cases.
 
 #######################################################################
 
-#Define a function to create a sample answerspace:
-def create_sample_answerspace(num_ans, condition):
+#CREATION OF TRAINING AND TESTING DATASETS
 
-    #Create array of possible answer spaces:
-    poss_ans_combinations = []
+#Define a function to create a sample answerspace:
+def create_sample_answerspace(num_ans):
 
     #Create all possible lists of combinations without repetition that are N in length of 1 or 0:
     poss_comb = list(itertools.product(range(2), repeat=num_ans))
@@ -51,8 +50,34 @@ def create_sample_answerspace(num_ans, condition):
 
     return poss_comb
 
+#Define a function to calculate overall risk factors, weighted by symptom.
+def calculate_sample_risk_factors(poss_comb, condition):
+
+    #Note: Here we explicitly define symptoms and weight them according to patient's assumed condition.
+    #Using standard weighted average: sum of terms divided by sum of weights.
+
+    all_risk_factors = []
+
+    #Define weight vector associated with questions with condition:
+    if condition == 'heart attack':
+        weight_vector = [0.25, 0.25, 0.25, 0.25, 1, 2, 2, 2, 2, 1]
+    else:
+        weight_vector = [2, 1, 1, 2, 2, 0.25, 0.25, 2, 1, 2]
+
+    #Calculate risk factor associated with each possible combination of answers:
+    weight_sum = np.sum(weight_vector)
+    for i in range(len(poss_comb)):
+        risk_factor = np.round(np.dot(poss_comb[i], weight_vector)/weight_sum)
+        all_risk_factors.append(risk_factor)
+
+    poss_risk_factors = [0, 1, 2]
+
+    return all_risk_factors, poss_risk_factors
+
+
+
 #######################################################################
     
 if __name__ == '__main__':
 
-    create_sample_answerspace(10, condition='heart attack')
+    pass
