@@ -195,10 +195,10 @@ def pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_d
     #And then calculate our correct percentage of values.
     percentage_correct = diagonal_sum/len(risk_factors_test_list) * 100
     
-    return percentage_correct, training_losses
+    return percentage_correct, training_losses, model
 
 #Define a function to save the neural network and its weights:
-def save_NN(model, condition, max_trials, data_set_frac, num_epochs, batch_sze, learning_rate):
+def save_NN(condition, max_trials, data_set_frac, num_epochs, batch_sze, learning_rate):
     
     #Shit for saving
     basefolder = pathlib.Path(__file__)
@@ -215,7 +215,7 @@ def save_NN(model, condition, max_trials, data_set_frac, num_epochs, batch_sze, 
     training_dataset, testing_dataset = get_datasets(data_set_frac, condition)
 
     for i in range(max_trials):
-        percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
+        percentage_correct, training_losses, model = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
         
         #If we have a better result, then save:
         if percentage_correct > max_accuracy:
@@ -225,6 +225,8 @@ def save_NN(model, condition, max_trials, data_set_frac, num_epochs, batch_sze, 
             #Saving entire model:
             torch.save(model, data_dir + condition + 'model_complete.pth')
             max_accuracy = percentage_correct
+
+    print('Maximum accuracy = ' + str(round(max_accuracy, 3)))
 
 #######################################################################
 
@@ -274,4 +276,11 @@ def test_NN_timing(num_epochs, num_tests):
 
 if __name__ == '__main__':
 
-    test_NN_timing(50, 60)
+    condition = 'heart attack'
+    max_trials = 50
+    data_set_frac = 0.5
+    num_epochs = 50
+    batch_sze = 20
+    learning_rate = 0.0003
+
+    save_NN(condition, max_trials, data_set_frac, num_epochs, batch_sze, learning_rate)
