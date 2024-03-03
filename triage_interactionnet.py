@@ -12,7 +12,10 @@ import os
 import pathlib 
 import numpy as np
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+#device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cpu'
+
+from triage_neuralnet import NeuralNetwork
 
 #######################################################################
 
@@ -29,7 +32,7 @@ def import_user_data():
     #Note: Import condition from user.
     condition = 'wound'
     #Note: Import user_data from user.
-    user_data = np.array([0, 1, 1, 0, 0, 1, 1, 0, 1, 1])
+    user_data = torch.tensor([0, 1, 1, 0, 0, 1, 1, 0, 1, 1])
 
     return condition, user_data
 
@@ -41,6 +44,8 @@ def import_model(condition):
        model_dir = os.path.join(script_dir, 'NN_Data/', 'heart attackmodel_complete.pth')
     else:
        model_dir = os.path.join(script_dir, 'NN_Data/', 'woundmodel_complete.pth')
+
+    print(model_dir)
 
     model = torch.load(model_dir)
 

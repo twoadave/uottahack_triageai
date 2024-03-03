@@ -18,7 +18,8 @@ import pathlib
 
 import numpy as np
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+#device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cpu'
 
 import timeit
 
