@@ -62,3 +62,5 @@ if __name__ == '__main__':
     model = import_model(condition)
 
     user_risk_factor = test_user_data(model, user_data)
+
+    print(user_risk_factor)
