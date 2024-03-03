@@ -77,14 +77,14 @@ class NeuralNetwork(nn.Module):
         #Put in our layers do do doooo oh god I had like four shots at the bar i'm dying
         #helooooo whoever is reading this! :^) 
 
-        self.layer_1 = nn.Linear(10, 80) 
-        self.layer_2 = nn.Linear(80, 40)
+        self.layer_1 = nn.Linear(10, 100) 
+        self.layer_2 = nn.Linear(100, 50)
         #we output a single thing because whatever
-        self.layer_out = nn.Linear(40, 3)
+        self.layer_out = nn.Linear(50, 3)
         self.relu = nn.ReLU()
         #erm yeah do batches because this is how i did it before ok
-        self.batchnorm1 = nn.BatchNorm1d(80)
-        self.batchnorm2 = nn.BatchNorm1d(40)
+        self.batchnorm1 = nn.BatchNorm1d(100)
+        self.batchnorm2 = nn.BatchNorm1d(50)
 
     #define forward pass
     def forward(self, inputs):
@@ -240,15 +240,18 @@ def test_NN_timing(num_epochs, num_tests):
     if not os.path.isdir(plots_dir):
         os.makedirs(plots_dir)
 
+    mean_time = np.mean(times)
+    mean_accuracy = np.mean(accuracies)
+
     plt.scatter(times, accuracies)
-    plt.title('Distribution of Time Taken to Train & Test Neural Network and Accuracy \n Epochs = ' + str(num_epochs) + ', L1 Nodes = 80, L2 Nodes = 40')
-    plt.xlabel('Computation Time [s]')
-    plt.ylabel('Neural Network Accuracy [%]')
-    plt.savefig(plots_dir + 'nn_training_time_accuracy_' + str(num_epochs) + '_epochs_N1.png')
+    plt.title('Distribution of Time Taken to Train & Test Neural Network and Accuracy \n Epochs = ' + str(num_epochs) + ', L1 Nodes = 100, L2 Nodes = 50')
+    plt.xlabel('Computation Time [s] \n Mean Time = ' + str(round(mean_time, 3)) + ' [s]')
+    plt.ylabel('Neural Network Accuracy [%] \n Mean Accuracy = ' + str(round(mean_accuracy, 3)) + ' [s]')
+    plt.savefig(plots_dir + 'nn_training_time_accuracy_' + str(num_epochs) + '_epochs_N2.png')
       
 
 #######################################################################
 
 if __name__ == '__main__':
 
-    test_NN_timing(75, 50)
+    test_NN_timing(50, 50)
