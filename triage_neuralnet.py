@@ -254,4 +254,4 @@ def test_NN_timing(num_epochs, num_tests):
 
 if __name__ == '__main__':
 
-    test_NN_timing(50, 60)
+    test_NN_timing(75, 60)
