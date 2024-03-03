@@ -36,10 +36,11 @@ def import_user_data():
 #Define a function to import our neural network model:
 def import_model(condition):
 
-    filename = condition + 'model_complete.pth'
-
     script_dir = os.path.dirname(__file__)
-    model_dir = os.path.join(script_dir, 'NN_Data/', filename)
+    if condition == 'heart_attack':
+       model_dir = os.path.join(script_dir, 'NN_Data/', 'heart attackmodel_complete.pth')
+    else:
+       model_dir = os.path.join(script_dir, 'NN_Data/', 'woundmodel_complete.pth')
 
     model = torch.load(model_dir)
 
