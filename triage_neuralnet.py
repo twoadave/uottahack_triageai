@@ -22,6 +22,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 import timeit
 
+import matplotlib.pyplot as plt
+
 #######################################################################
 
 #RANDOM ASS FUNCTIONS WE NEED
@@ -75,14 +77,14 @@ class NeuralNetwork(nn.Module):
         #Put in our layers do do doooo oh god I had like four shots at the bar i'm dying
         #helooooo whoever is reading this! :^) 
 
-        self.layer_1 = nn.Linear(10, 40) 
-        self.layer_2 = nn.Linear(40, 20)
+        self.layer_1 = nn.Linear(10, 80) 
+        self.layer_2 = nn.Linear(80, 40)
         #we output a single thing because whatever
-        self.layer_out = nn.Linear(20, 3)
+        self.layer_out = nn.Linear(40, 3)
         self.relu = nn.ReLU()
         #erm yeah do batches because this is how i did it before ok
-        self.batchnorm1 = nn.BatchNorm1d(40)
-        self.batchnorm2 = nn.BatchNorm1d(20)
+        self.batchnorm1 = nn.BatchNorm1d(80)
+        self.batchnorm2 = nn.BatchNorm1d(40)
 
     #define forward pass
     def forward(self, inputs):
@@ -206,13 +208,54 @@ def save_NN(model):
 
 #######################################################################
 
+#NEURAL NETWORK SIZE TESTING
+
+def test_NN(num_epochs, num_tests):
+    
+    condition = 'heart attack'
+    data_set_frac = 0.5
+    batch_sze = 20
+    learning_rate = 0.0003
+    
+    times = []
+    accuracies = []
+
+    training_dataset, testing_dataset = get_datasets(data_set_frac, condition)
+    
+    for i in range(num_tests):
+       
+        start = timeit.default_timer()
+        percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
+        stop = timeit.default_timer()
+        execution_time = stop - start
+
+        times.append(execution_time)
+        accuracies.append(percentage_correct)
+
+    basefolder = pathlib.Path(__file__)
+
+    script_dir = os.path.dirname(__file__)
+    plots_dir = os.path.join(script_dir, 'Plots/')
+
+    if not os.path.isdir(plots_dir):
+        os.makedirs(plots_dir)
+
+    plt.scatter(times, accuracies)
+    plt.title('Distribution of Time Taken to Train & Test Neural Network and Accuracy \n Epochs = ' + str(num_epochs) + ', L1 Nodes = 80, L2 Nodes = 40')
+    plt.xlabel('Computation Time [s]')
+    plt.ylabel('Neural Network Accuracy [%]')
+    plt.savefig(plots_dir + 'nn_training_time_accuracy_' + str(num_epochs) + '_epochs_N1.png')
+      
+
+#######################################################################
+
 if __name__ == '__main__':
 
-    start = timeit.default_timer()
+    '''start = timeit.default_timer()
 
     condition = 'heart attack'
     data_set_frac = 0.5
-    num_epochs = 25
+    num_epochs = 50
     batch_sze = 20
     learning_rate = 0.0003
 
@@ -220,9 +263,9 @@ if __name__ == '__main__':
 
     percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
 
-    print(percentage_correct)
-
     stop = timeit.default_timer()
     execution_time = stop - start
 
-    print('Program executed in ' +str(execution_time) + ' seconds with ' + str(round(percentage_correct, 2)) + 'percent accuracy.')
+    print('Program executed in ' +str(execution_time) + ' seconds with ' + str(round(percentage_correct, 2)) + ' percent accuracy.')'''
+
+    test_NN(50, 50)
