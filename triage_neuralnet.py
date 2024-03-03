@@ -20,6 +20,10 @@ import numpy as np
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+#######################################################################
+
+#RANDOM ASS FUNCTIONS WE NEED
+
 #Define function to add elements on to the end of a list.
 def merger(seglist):
   total_list = []
@@ -27,6 +31,31 @@ def merger(seglist):
     #Add given elements of input list to the end.
     total_list.extend(seg)
   return total_list
+
+def get_datasets(data_set_frac):
+    
+    #Now we need to grab our training and testing data from file:
+    basefolder = pathlib.Path(__file__)
+    script_dir = os.path.dirname(__file__)
+    numbers_dir = os.path.join(script_dir, 'NN_Data/')
+
+    with np.load(numbers_dir.with_name('data_%g_frac_heartattack.npz'%(data_set_frac))) as f:
+        poss_risk_factors = f['poss_rf']
+        risk_factors_training = f['rf_training']
+        poss_comb_training = f['pc_training']
+        risk_factors_testing = f['rf_testing']
+        poss_comb_testing = f['pc_testing']
+
+    #Now we need to make these all into tensors and datasets...
+    risk_factors_training_tensor = torch.tensor(risk_factors_training)
+    poss_comb_training_tensor = torch.tensor(poss_comb_training)
+    training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)
+
+    risk_factors_testing_tensor = torch.tensor(risk_factors_testing)
+    poss_comb_testing_tensor = torch.tensor(poss_comb_testing)
+    testing_dataset = TensorDataset(poss_comb_testing_tensor, risk_factors_testing_tensor)
+
+    return training_dataset, testing_dataset
 
 #######################################################################
 
@@ -120,31 +149,6 @@ def test_NN(model, test_dataloader):
     
     return risk_factors_test_list, risk_factors_pred_list
 
-def get_datasets(data_set_frac):
-    
-    #Now we need to grab our training and testing data from file:
-    basefolder = pathlib.Path(__file__)
-    script_dir = os.path.dirname(__file__)
-    numbers_dir = os.path.join(script_dir, 'NN_Data/')
-
-    with np.load(numbers_dir.with_name('data_%g_frac_heartattack.npz'%(data_set_frac))) as f:
-        poss_risk_factors = f['poss_rf']
-        risk_factors_training = f['rf_training']
-        poss_comb_training = f['pc_training']
-        risk_factors_testing = f['rf_testing']
-        poss_comb_testing = f['pc_testing']
-
-    #Now we need to make these all into tensors and datasets...
-    risk_factors_training_tensor = torch.tensor(risk_factors_training)
-    poss_comb_training_tensor = torch.tensor(poss_comb_training)
-    training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)
-
-    risk_factors_testing_tensor = torch.tensor(risk_factors_testing)
-    poss_comb_testing_tensor = torch.tensor(poss_comb_testing)
-    testing_dataset = TensorDataset(poss_comb_testing_tensor, risk_factors_testing_tensor)
-
-    return training_dataset, testing_dataset
-
 #Define a function that we use to call our neural network:
 def pass_to_NN(num_epochs, batch_sze, learning_rate, num_ans, nodes_1, nodes_2, training_dataset, testing_dataset):
     
@@ -184,3 +188,20 @@ def pass_to_NN(num_epochs, batch_sze, learning_rate, num_ans, nodes_1, nodes_2, 
     percentage_correct = diagonal_sum/len(risk_factors_test_list) * 100
     
     return percentage_correct, training_losses
+
+#######################################################################
+
+if __name__ == '__main__':
+
+    num_ans = 10
+    condition = 'heart attack'
+    data_set_frac = 0.5
+    num_epochs = 25,
+    batch_sze = 20,
+    learning_rate = 0.0003,
+    nodes_1 = 20,
+    nodes_2 = 40,
+
+    training_dataset, testing_dataset = get_datasets(data_set_frac)
+
+    percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, num_ans, nodes_1, nodes_2, training_dataset, testing_dataset)
