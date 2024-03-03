@@ -251,21 +251,4 @@ def test_NN_timing(num_epochs, num_tests):
 
 if __name__ == '__main__':
 
-    '''start = timeit.default_timer()
-
-    condition = 'heart attack'
-    data_set_frac = 0.5
-    num_epochs = 50
-    batch_sze = 20
-    learning_rate = 0.0003
-
-    training_dataset, testing_dataset = get_datasets(data_set_frac, condition)
-
-    percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
-
-    stop = timeit.default_timer()
-    execution_time = stop - start
-
-    print('Program executed in ' +str(execution_time) + ' seconds with ' + str(round(percentage_correct, 2)) + ' percent accuracy.')'''
-
-    test_NN_timing(50, 50)
+    test_NN_timing(75, 50)
