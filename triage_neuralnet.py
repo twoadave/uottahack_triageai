@@ -14,6 +14,14 @@ from torch.utils.data import DataLoader
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+#Define function to add elements on to the end of a list.
+def merger(seglist):
+  total_list = []
+  for seg in seglist:
+    #Add given elements of input list to the end.
+    total_list.extend(seg)
+  return total_list
+
 #######################################################################
 
 #CREATE NEURAL NETWORK
@@ -77,3 +85,31 @@ def train_NN(model, loss_fn, optimizer, training_dataloader, training_loss):
         training_pass_loss += train_loss.item()
 
     return training_pass_loss
+
+#Define a function which we can call to test our neural network:
+def test_NN(model, test_dataloader):
+    
+    #Initialize list of testing and predicted risk factors:
+    risk_factors_test_list = []
+    risk_factors_pred_list = []
+
+    with torch.no_grad():
+      #Put our network into testing mode:
+      model.eval()
+      
+      #For all:
+      for poss_comb_batch, risk_factors_batch in test_dataloader:
+        poss_comb_batch = poss_comb_batch.to(device)
+        risk_factors_test_pred = model(poss_comb_batch.float())
+        _, risk_factors_pred_tags = torch.max(risk_factors_test_pred, dim = 1)
+        risk_factors_pred_list.append(risk_factors_pred_tags.cpu().numpy())
+        risk_factors_test_list.append(risk_factors_batch)
+    
+    if len(risk_factors_pred_list) > 1:
+        risk_factors_pred_list = [a.squeeze().tolist() for a in risk_factors_pred_list]
+        risk_factors_test_list = [a.squeeze().tolist() for a in risk_factors_test_list]
+        #Well we throw all these lists together here.
+        risk_factors_test_list = merger(risk_factors_test_list)
+        risk_factors_pred_list = merger(risk_factors_pred_list)
+    
+    return risk_factors_test_list, risk_factors_pred_list
