@@ -1,0 +1,8 @@
+HospitalID,Beds,Doctors,Patients,Nurses,Ventilators,ECGs,Street,Postal,EstimatedWaitTime
+Queensway Carleton,50,10,45,18,3,9,"3045 Baseline Rd, Nepean, ON ",K2H 8P4,
+Civic Hospital,60,16,65,13,4,6,"210 Melrose Ave, Ottawa, ON ",K1Y 4K7,
+Elisabeth Bruyere Hospital,40,5,87,3,4,4,"43 Bruyere St, Ottawa, ON ",K1N 5C8,
+Montfort Hospital,60,7,56,9,6,9,"713 Montreal Rd, Ottawa, ON ",K1K 0T2,
+Saint-Vincent Hospital,25,3,40,6,2,7,"60 Cambridge St N, Ottawa, ON",K1R 7A5,
+Lake Greenwood Institute for Health,15,5,65,7,7,9,"345 Hoodlum Av, Ottawa, ON",K2E 3G7,
+Central Riverside Hospital ,26,8,50,12,9,2,"582 Pooki St, Ottawa, ON",K3D 5E3,
