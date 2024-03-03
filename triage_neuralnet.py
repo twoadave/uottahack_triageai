@@ -46,12 +46,12 @@ def get_datasets(data_set_frac):
         poss_comb_testing = f['pc_testing']
 
     #Now we need to make these all into tensors and datasets...
-    risk_factors_training_tensor = torch.tensor(risk_factors_training)
-    poss_comb_training_tensor = torch.tensor(poss_comb_training)
+    risk_factors_training_tensor = torch.tensor(risk_factors_training, dtype=torch.long)
+    poss_comb_training_tensor = torch.tensor(poss_comb_training, dtype=torch.float32)
     training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)
 
-    risk_factors_testing_tensor = torch.tensor(risk_factors_testing)
-    poss_comb_testing_tensor = torch.tensor(poss_comb_testing)
+    risk_factors_testing_tensor = torch.tensor(risk_factors_testing, dtype=torch.long)
+    poss_comb_testing_tensor = torch.tensor(poss_comb_testing, dtype=torch.float32)
     testing_dataset = TensorDataset(poss_comb_testing_tensor, risk_factors_testing_tensor)
 
     return training_dataset, testing_dataset
@@ -73,7 +73,7 @@ class NeuralNetwork(nn.Module):
         self.layer_1 = nn.Linear(10, 40) 
         self.layer_2 = nn.Linear(40, 20)
         #we output a single thing because whatever
-        self.layer_out = nn.Linear(20, 2)
+        self.layer_out = nn.Linear(20, 3)
         self.relu = nn.ReLU()
         #erm yeah do batches because this is how i did it before ok
         self.batchnorm1 = nn.BatchNorm1d(40)
@@ -98,6 +98,7 @@ def train_NN(model, loss_fn, optimizer, training_dataloader, training_loss):
 
     #Training wheels on children:
     model.train()
+    training_pass_loss =0
 
     #For each batch in our training data:
     for poss_comb_batch, risk_factors_batch in training_dataloader:
@@ -155,7 +156,7 @@ def pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_d
     model = NeuralNetwork().to(device)
     #Declare our loss function and optimizer.
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), learning_rate, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
     #Create batches wwwwwwwww
     train_dataloader = DataLoader(training_dataset, batch_sze, drop_last = True, shuffle = True)
@@ -195,10 +196,12 @@ if __name__ == '__main__':
 
     condition = 'heart attack'
     data_set_frac = 0.5
-    num_epochs = 25,
-    batch_sze = 20,
-    learning_rate = 0.0003,
+    num_epochs = 25
+    batch_sze = 20
+    learning_rate = 0.0003
 
     training_dataset, testing_dataset = get_datasets(data_set_frac)
 
     percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
+
+    print(percentage_correct)
