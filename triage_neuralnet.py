@@ -210,7 +210,7 @@ def save_NN(model):
 
 #NEURAL NETWORK SIZE TESTING
 
-def test_NN(num_epochs, num_tests):
+def test_NN_timing(num_epochs, num_tests):
     
     condition = 'heart attack'
     data_set_frac = 0.5
@@ -268,4 +268,4 @@ if __name__ == '__main__':
 
     print('Program executed in ' +str(execution_time) + ' seconds with ' + str(round(percentage_correct, 2)) + ' percent accuracy.')'''
 
-    test_NN(50, 50)
+    test_NN_timing(50, 50)
