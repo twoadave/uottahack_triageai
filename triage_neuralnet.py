@@ -10,7 +10,13 @@ IN THIS FILE: Actual neural network code, creation and training of neural networ
 import torch
 import torch.optim as optim
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
+from sklearn.metrics import confusion_matrix
+
+import os
+import pathlib 
+
+import numpy as np
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -113,3 +119,68 @@ def test_NN(model, test_dataloader):
         risk_factors_pred_list = merger(risk_factors_pred_list)
     
     return risk_factors_test_list, risk_factors_pred_list
+
+def get_datasets(data_set_frac):
+    
+    #Now we need to grab our training and testing data from file:
+    basefolder = pathlib.Path(__file__)
+    script_dir = os.path.dirname(__file__)
+    numbers_dir = os.path.join(script_dir, 'NN_Data/')
+
+    with np.load(numbers_dir.with_name('data_%g_frac_heartattack.npz'%(data_set_frac))) as f:
+        poss_risk_factors = f['poss_rf']
+        risk_factors_training = f['rf_training']
+        poss_comb_training = f['pc_training']
+        risk_factors_testing = f['rf_testing']
+        poss_comb_testing = f['pc_testing']
+
+    #Now we need to make these all into tensors and datasets...
+    risk_factors_training_tensor = torch.tensor(risk_factors_training)
+    poss_comb_training_tensor = torch.tensor(poss_comb_training)
+    training_dataset = TensorDataset(poss_comb_training_tensor, risk_factors_training_tensor)
+
+    risk_factors_testing_tensor = torch.tensor(risk_factors_testing)
+    poss_comb_testing_tensor = torch.tensor(poss_comb_testing)
+    testing_dataset = TensorDataset(poss_comb_testing_tensor, risk_factors_testing_tensor)
+
+    return training_dataset, testing_dataset
+
+#Define a function that we use to call our neural network:
+def pass_to_NN(num_epochs, batch_sze, learning_rate, num_ans, nodes_1, nodes_2, training_dataset, testing_dataset):
+    
+    model = NeuralNetwork(num_ans, nodes_1, nodes_2).to(device)
+    #Declare our loss function and optimizer.
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(model.parameters(), learning_rate)
+
+    #Create batches wwwwwwwww
+    train_dataloader = DataLoader(training_dataset, batch_sze, drop_last = True, shuffle = True)
+    test_dataloader = DataLoader(testing_dataset, batch_sze, drop_last = True, shuffle = True)
+
+    #Initialize loss value.
+    training_pass_loss = 0
+    #Initialize array to store our loss values.
+    training_losses = []
+
+    #Make our training passes over the network.
+    for i in range(1, num_epochs+1):
+        #Call our training NN.
+        training_step_loss = train_NN(model, loss_fn, optimizer, train_dataloader, training_pass_loss)
+        #And append it to an array to store it.
+        training_losses.append(training_step_loss)
+
+    #Test our neural network.
+    risk_factors_test_list, risk_factors_pred_list = test_NN(model, test_dataloader)
+
+    #Create confusion matrix of testing and predicted values,
+    results = confusion_matrix(risk_factors_test_list, risk_factors_pred_list)
+    
+    #Read the number of correct values off of this matrix.
+    diagonal_sum = 0
+    for i in range(results.shape[0]):
+      diagonal_sum += results[i][i]
+      
+    #And then calculate our correct percentage of values.
+    percentage_correct = diagonal_sum/len(risk_factors_test_list) * 100
+    
+    return percentage_correct, training_losses
