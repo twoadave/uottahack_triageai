@@ -155,7 +155,7 @@ def create_tt_data(all_risk_factors, poss_comb, total_num_datapoints, data_set_f
     if not os.path.isdir(numbers_dir):
         os.makedirs(numbers_dir)
 
-    np.savez_compressed(numbers_dir + 'data_%g_frac_heartattack.npz'%(data_set_frac), poss_rf = poss_risk_factors, rf_training=risk_factors_training, pc_training=poss_comb_training, rf_testing=risk_factors_testing, pc_testing=poss_comb_testing)
+    np.savez_compressed(numbers_dir + 'data_%g_frac_wound.npz'%(data_set_frac), poss_rf = poss_risk_factors, rf_training=risk_factors_training, pc_training=poss_comb_training, rf_testing=risk_factors_testing, pc_testing=poss_comb_testing)
     
 #Now create a function that runs all our shit.
 def generate_datasets(num_ans, condition, data_set_frac):
@@ -169,7 +169,7 @@ def generate_datasets(num_ans, condition, data_set_frac):
 if __name__ == '__main__':
 
     num_ans = 10
-    condition = 'heart attack'
+    condition = 'wound'
     data_set_frac = 0.5
 
     generate_datasets(num_ans, condition, data_set_frac)
