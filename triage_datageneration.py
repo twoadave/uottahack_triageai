@@ -18,6 +18,8 @@ import pathlib
 import torch
 from torch.utils.data import TensorDataset
 
+import timeit
+
 #######################################################################
 
 '''Create test case criteria: 
@@ -168,8 +170,15 @@ def generate_datasets(num_ans, condition, data_set_frac):
     
 if __name__ == '__main__':
 
+    start = timeit.default_timer()
+
     num_ans = 10
     condition = 'wound'
     data_set_frac = 0.5
 
     generate_datasets(num_ans, condition, data_set_frac)
+
+    stop = timeit.default_timer()
+    execution_time = stop - start
+
+    print('Program executed in ' +str(execution_time) + ' seconds.')

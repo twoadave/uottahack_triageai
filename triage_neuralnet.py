@@ -190,6 +190,15 @@ def pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_d
     
     return percentage_correct, training_losses
 
+#Define a function to save the neural network and its weights:
+def save_NN(model):
+   
+   #Saving just state dictionary:
+   torch.save(model.state_dict(), 'model_weights.pth')
+
+   #Saving entire model:
+   torch.save(model, 'model_complete.pth')
+   
 #######################################################################
 
 if __name__ == '__main__':
