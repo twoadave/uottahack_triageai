@@ -31,16 +31,49 @@ class NeuralNetwork(nn.Module):
         self.layer_2 = nn.Linear(nodes_1, nodes_2)
         #we output a single thing because whatever
         self.layer_out = nn.Linear(nodes_2, 1)
-        
         self.relu = nn.ReLU()
+        #erm yeah do batches because this is how i did it before ok
         self.batchnorm1 = nn.BatchNorm1d(nodes_1)
         self.batchnorm2 = nn.BatchNorm1d(nodes_2)
 
-
+    #define forward pass
     def forward(self, inputs):
+        #inputs! relu! batches! outputs! they're all here!
         x = self.relu(self.layer_1(inputs))
         x = self.batchnorm1(x)
         x = self.relu(self.layer_2(x))
         x = self.batchnorm2(x)
         x = self.layer_out(x)
         return x
+    
+#######################################################################
+    
+#TRAINING AND TESTING NEURAL NETWORK
+    
+#Define a function to train our neural network whee
+def train_NN(model, loss_fn, optimizer, training_dataloader, training_loss):
+
+    #Training wheels on children:
+    model.train()
+
+    #For each batch in our training data:
+    for poss_comb_batch, risk_factors_batch in training_dataloader:
+        #Send a batch of possible answer configurations to our network:
+        poss_comb_batch = poss_comb_batch.to(device)
+        risk_factors_batch = risk_factors_batch.type(torch.LongTensor)
+        risk_factors_batch = risk_factors_batch.to(device)
+
+        #Effectively forward pass lol
+        optimizer.zero_grad()
+        #compute our actual predicted risk value:
+        risk_pred = model(poss_comb_batch.float())
+
+        #Compute loss:
+        train_loss = loss_fn(risk_pred, risk_factors_batch)
+
+        #Backwards pass:
+        train_loss.backward()
+        optimizer.step()
+        training_pass_loss += train_loss.item()
+
+    return training_pass_loss
