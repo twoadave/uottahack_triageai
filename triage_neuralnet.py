@@ -245,8 +245,8 @@ def test_NN_timing(num_epochs, num_tests):
 
     plt.scatter(times, accuracies)
     plt.title('Distribution of Time Taken to Train & Test Neural Network and Accuracy \n Epochs = ' + str(num_epochs) + ', L1 Nodes = 100, L2 Nodes = 50')
-    plt.xlabel('Computation Time [s] \n Mean Time = ' + str(round(mean_time, 3)) + ' [s]')
-    plt.ylabel('Neural Network Accuracy [%] \n Mean Accuracy = ' + str(round(mean_accuracy, 3)) + ' [s]')
+    plt.xlabel('Computation Time [s], Mean Time = ' + str(round(mean_time, 3)) + ' [s]')
+    plt.ylabel('Neural Network Accuracy [%] \n Mean Accuracy = ' + str(round(mean_accuracy, 3)) + ' [%]')
     plt.savefig(plots_dir + 'nn_training_time_accuracy_' + str(num_epochs) + '_epochs_N2.png')
       
 
@@ -254,4 +254,4 @@ def test_NN_timing(num_epochs, num_tests):
 
 if __name__ == '__main__':
 
-    test_NN_timing(50, 50)
+    test_NN_timing(50, 60)
