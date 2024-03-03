@@ -11,6 +11,7 @@ import torch
 import os
 import pathlib 
 import numpy as np
+from torch.utils.data import DataLoader, TensorDataset
 
 #device = 'cuda' if torch.cuda.is_available() else 'cpu'
 device = 'cpu'
@@ -29,10 +30,16 @@ learning_rate = 0.0003
 
 #Define a function to retrieve our user data and condition from somewhere:
 def import_user_data():
+
     #Note: Import condition from user.
     condition = 'wound'
     #Note: Import user_data from user.
-    user_data = torch.tensor([0, 1, 1, 0, 0, 1, 1, 0, 1, 1])
+
+    given_user_data = torch.tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], dtype=torch.float32)
+    risk_factor_default = torch.tensor([1], dtype=torch.long)
+
+    user_data_tensor = TensorDataset(given_user_data, risk_factor_default)
+    user_data = DataLoader(user_data_tensor, 1, drop_last = False, shuffle = False)
 
     return condition, user_data
 
@@ -54,13 +61,19 @@ def import_model(condition):
 #Define a function to classify our user data into a risk category:
 def test_user_data(model, user_data):
 
-    #Make sure to put it into eval mode!
-    model.eval()
+    model = model.to(device)
 
     with torch.no_grad():
-        user_risk_factor = model(user_data)
+        #Put our network into testing mode:
+        model.eval()
 
-    return user_risk_factor
+        for combination_batch, risk_factors_batch in user_data:
+            combination_batch = combination_batch.to(device)
+            user_risk_factor_pred = model(combination_batch.float())
+            _, risk_factor_pred_tag = torch.max(user_risk_factor_pred, dim = 1)
+            user_risk_factor = risk_factor_pred_tag.cpu().numpy()
+
+    return user_risk_factor[0]
 
 #######################################################################
 
@@ -70,5 +83,3 @@ if __name__ == '__main__':
     model = import_model(condition)
 
     user_risk_factor = test_user_data(model, user_data)
-
-    print(user_risk_factor)
