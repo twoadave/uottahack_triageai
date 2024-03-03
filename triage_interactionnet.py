@@ -29,13 +29,15 @@ learning_rate = 0.0003
 #######################################################################
 
 #Define a function to retrieve our user data and condition from somewhere:
-def import_user_data():
+def import_user_data(filepath):
 
-    #Note: Import condition from user.
-    condition = 'wound'
-    #Note: Import user_data from user.
+    with np.load(filepath) as f:
+        user_ans = f['user_data']
+        condition = f['user_condition']
 
-    given_user_data = torch.tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], dtype=torch.float32)
+    user_ans = np.array([np.array(user_ans)])
+
+    given_user_data = torch.tensor(user_ans, dtype=torch.float32)
     risk_factor_default = torch.tensor([1], dtype=torch.long)
 
     user_data_tensor = TensorDataset(given_user_data, risk_factor_default)
