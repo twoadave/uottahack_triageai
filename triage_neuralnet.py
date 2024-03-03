@@ -276,7 +276,7 @@ def test_NN_timing(num_epochs, num_tests):
 
 if __name__ == '__main__':
 
-    condition = 'heart attack'
+    condition = 'wound'
     max_trials = 50
     data_set_frac = 0.5
     num_epochs = 50
