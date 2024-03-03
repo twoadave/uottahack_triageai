@@ -77,14 +77,14 @@ class NeuralNetwork(nn.Module):
         #Put in our layers do do doooo oh god I had like four shots at the bar i'm dying
         #helooooo whoever is reading this! :^) 
 
-        self.layer_1 = nn.Linear(10, 100) 
-        self.layer_2 = nn.Linear(100, 50)
+        self.layer_1 = nn.Linear(10, 60) 
+        self.layer_2 = nn.Linear(60, 30)
         #we output a single thing because whatever
-        self.layer_out = nn.Linear(50, 3)
+        self.layer_out = nn.Linear(30, 3)
         self.relu = nn.ReLU()
         #erm yeah do batches because this is how i did it before ok
-        self.batchnorm1 = nn.BatchNorm1d(100)
-        self.batchnorm2 = nn.BatchNorm1d(50)
+        self.batchnorm1 = nn.BatchNorm1d(60)
+        self.batchnorm2 = nn.BatchNorm1d(30)
 
     #define forward pass
     def forward(self, inputs):
@@ -244,14 +244,14 @@ def test_NN_timing(num_epochs, num_tests):
     mean_accuracy = np.mean(accuracies)
 
     plt.scatter(times, accuracies)
-    plt.title('Distribution of Time Taken to Train & Test Neural Network and Accuracy \n Epochs = ' + str(num_epochs) + ', L1 Nodes = 100, L2 Nodes = 50')
+    plt.title('Distribution of Time Taken to Train & Test Neural Network and Accuracy \n Epochs = ' + str(num_epochs) + ', L1 Nodes = 60, L2 Nodes = 30')
     plt.xlabel('Computation Time [s], Mean Time = ' + str(round(mean_time, 3)) + ' [s]')
     plt.ylabel('Neural Network Accuracy [%] \n Mean Accuracy = ' + str(round(mean_accuracy, 3)) + ' [%]')
-    plt.savefig(plots_dir + 'nn_training_time_accuracy_' + str(num_epochs) + '_epochs_N2.png')
+    plt.savefig(plots_dir + 'nn_training_time_accuracy_' + str(num_epochs) + '_epochs_N3.png')
       
 
 #######################################################################
 
 if __name__ == '__main__':
 
-    test_NN_timing(75, 60)
+    test_NN_timing(50, 60)
