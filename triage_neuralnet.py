@@ -20,6 +20,8 @@ import numpy as np
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+import timeit
+
 #######################################################################
 
 #RANDOM ASS FUNCTIONS WE NEED
@@ -32,11 +34,14 @@ def merger(seglist):
     total_list.extend(seg)
   return total_list
 
-def get_datasets(data_set_frac):
+def get_datasets(data_set_frac, condition):
     
     #Now we need to grab our training and testing data from file:
     script_dir = os.path.dirname(__file__)
-    numbers_dir = os.path.join(script_dir, 'NN_Data/', 'data_%g_frac_heartattack.npz'%(data_set_frac))
+    if condition == 'heart_attack':
+       numbers_dir = os.path.join(script_dir, 'NN_Data/', 'data_%g_frac_heartattack.npz'%(data_set_frac))
+    else:
+       numbers_dir = os.path.join(script_dir, 'NN_Data/', 'data_%g_frac_wound.npz'%(data_set_frac))
 
     with np.load(numbers_dir) as f:
         poss_risk_factors = f['poss_rf']
@@ -198,10 +203,12 @@ def save_NN(model):
 
    #Saving entire model:
    torch.save(model, 'model_complete.pth')
-   
+
 #######################################################################
 
 if __name__ == '__main__':
+
+    start = timeit.default_timer()
 
     condition = 'heart attack'
     data_set_frac = 0.5
@@ -209,8 +216,13 @@ if __name__ == '__main__':
     batch_sze = 20
     learning_rate = 0.0003
 
-    training_dataset, testing_dataset = get_datasets(data_set_frac)
+    training_dataset, testing_dataset = get_datasets(data_set_frac, condition)
 
     percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
 
     print(percentage_correct)
+
+    stop = timeit.default_timer()
+    execution_time = stop - start
+
+    print('Program executed in ' +str(execution_time) + ' seconds with ' + str(round(percentage_correct, 2)) + 'percent accuracy.')
