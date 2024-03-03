@@ -77,14 +77,14 @@ class NeuralNetwork(nn.Module):
         #Put in our layers do do doooo oh god I had like four shots at the bar i'm dying
         #helooooo whoever is reading this! :^) 
 
-        self.layer_1 = nn.Linear(10, 60) 
-        self.layer_2 = nn.Linear(60, 30)
+        self.layer_1 = nn.Linear(10, 100) 
+        self.layer_2 = nn.Linear(100, 50)
         #we output a single thing because whatever
-        self.layer_out = nn.Linear(30, 3)
+        self.layer_out = nn.Linear(50, 3)
         self.relu = nn.ReLU()
         #erm yeah do batches because this is how i did it before ok
-        self.batchnorm1 = nn.BatchNorm1d(60)
-        self.batchnorm2 = nn.BatchNorm1d(30)
+        self.batchnorm1 = nn.BatchNorm1d(100)
+        self.batchnorm2 = nn.BatchNorm1d(50)
 
     #define forward pass
     def forward(self, inputs):
@@ -198,13 +198,33 @@ def pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_d
     return percentage_correct, training_losses
 
 #Define a function to save the neural network and its weights:
-def save_NN(model):
-   
-   #Saving just state dictionary:
-   torch.save(model.state_dict(), 'model_weights.pth')
+def save_NN(model, condition, max_trials, data_set_frac, num_epochs, batch_sze, learning_rate):
+    
+    #Shit for saving
+    basefolder = pathlib.Path(__file__)
 
-   #Saving entire model:
-   torch.save(model, 'model_complete.pth')
+    script_dir = os.path.dirname(__file__)
+    data_dir = os.path.join(script_dir, 'NN_Data/')
+
+    if not os.path.isdir(data_dir):
+        os.makedirs(data_dir)
+
+    max_accuracy = 0
+
+    #Get datasets
+    training_dataset, testing_dataset = get_datasets(data_set_frac, condition)
+
+    for i in range(max_trials):
+        percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
+        
+        #If we have a better result, then save:
+        if percentage_correct > max_accuracy:
+            
+            #Saving just state dictionary:
+            torch.save(model.state_dict(), data_dir + condition + 'model_weights.pth')
+            #Saving entire model:
+            torch.save(model, data_dir + condition + 'model_complete.pth')
+            max_accuracy = percentage_correct
 
 #######################################################################
 
