@@ -35,11 +35,10 @@ def merger(seglist):
 def get_datasets(data_set_frac):
     
     #Now we need to grab our training and testing data from file:
-    basefolder = pathlib.Path(__file__)
     script_dir = os.path.dirname(__file__)
-    numbers_dir = os.path.join(script_dir, 'NN_Data/')
+    numbers_dir = os.path.join(script_dir, 'NN_Data/', 'data_%g_frac_heartattack.npz'%(data_set_frac))
 
-    with np.load(numbers_dir.with_name('data_%g_frac_heartattack.npz'%(data_set_frac))) as f:
+    with np.load(numbers_dir) as f:
         poss_risk_factors = f['poss_rf']
         risk_factors_training = f['rf_training']
         poss_comb_training = f['pc_training']
@@ -65,19 +64,20 @@ def get_datasets(data_set_frac):
 class NeuralNetwork(nn.Module):
 
     #init
-    def __init__(self, num_ans, nodes_1, nodes_2):
+    def __init__(self):
         
         super(NeuralNetwork, self).__init__()
         #Put in our layers do do doooo oh god I had like four shots at the bar i'm dying
         #helooooo whoever is reading this! :^) 
-        self.layer_1 = nn.Linear(num_ans, nodes_1) 
-        self.layer_2 = nn.Linear(nodes_1, nodes_2)
+
+        self.layer_1 = nn.Linear(10, 40) 
+        self.layer_2 = nn.Linear(40, 20)
         #we output a single thing because whatever
-        self.layer_out = nn.Linear(nodes_2, 1)
+        self.layer_out = nn.Linear(20, 2)
         self.relu = nn.ReLU()
         #erm yeah do batches because this is how i did it before ok
-        self.batchnorm1 = nn.BatchNorm1d(nodes_1)
-        self.batchnorm2 = nn.BatchNorm1d(nodes_2)
+        self.batchnorm1 = nn.BatchNorm1d(40)
+        self.batchnorm2 = nn.BatchNorm1d(20)
 
     #define forward pass
     def forward(self, inputs):
@@ -150,12 +150,12 @@ def test_NN(model, test_dataloader):
     return risk_factors_test_list, risk_factors_pred_list
 
 #Define a function that we use to call our neural network:
-def pass_to_NN(num_epochs, batch_sze, learning_rate, num_ans, nodes_1, nodes_2, training_dataset, testing_dataset):
+def pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset):
     
-    model = NeuralNetwork(num_ans, nodes_1, nodes_2).to(device)
+    model = NeuralNetwork().to(device)
     #Declare our loss function and optimizer.
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), learning_rate)
+    optimizer = optim.SGD(model.parameters(), learning_rate, momentum=0.9)
 
     #Create batches wwwwwwwww
     train_dataloader = DataLoader(training_dataset, batch_sze, drop_last = True, shuffle = True)
@@ -193,15 +193,12 @@ def pass_to_NN(num_epochs, batch_sze, learning_rate, num_ans, nodes_1, nodes_2, 
 
 if __name__ == '__main__':
 
-    num_ans = 10
     condition = 'heart attack'
     data_set_frac = 0.5
     num_epochs = 25,
     batch_sze = 20,
     learning_rate = 0.0003,
-    nodes_1 = 20,
-    nodes_2 = 40,
 
     training_dataset, testing_dataset = get_datasets(data_set_frac)
 
-    percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, num_ans, nodes_1, nodes_2, training_dataset, testing_dataset)
+    percentage_correct, training_losses = pass_to_NN(num_epochs, batch_sze, learning_rate, training_dataset, testing_dataset)
